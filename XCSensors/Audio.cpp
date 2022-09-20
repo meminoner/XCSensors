@@ -98,6 +98,25 @@ void playToneInterval(int freq, int period, int tinterval) {
 
 }
 
+void playToneContinuous(int freq) {
+
+  int period = 50;
+
+  if (toneOn) {
+    int wait = period + tm;
+    if ( wait <= millis()) {
+      toneOn = false;
+      tone(BUZZPIN, freq, 300);
+    }
+
+  } else {
+    tone(BUZZPIN, freq, 300);
+    toneOn = true;
+    tm = millis();
+  }
+
+}
+
 
 // nth beeps then pauze x
 
@@ -120,6 +139,7 @@ void playTonePause(int freq, int nbeeps, int tpause) {
   
 }
 
+
 void makeVarioAudio(float vario) {
   int pulse;
   float varioorg = vario;
@@ -127,13 +147,13 @@ void makeVarioAudio(float vario) {
 #if defined(TESTBUZZER)
   vario = testvario;
   int tpassed = millis() - btime;
-  if (tpassed > 2000) {
+  if (tpassed > 1000) {
     testvario = testvario + 0.2;
     btime = millis();
   }
 
-  if (testvario > 9 ) {
-    testvario = -6;
+  if (testvario > 6 ) {
+    testvario = -3;
   }
 
   
@@ -158,23 +178,33 @@ void makeVarioAudio(float vario) {
 
 #endif
 
-    if (vario <= 0 && vario >= BUZZERZEROCLIMB) {
-      if (!muted) {
-         playToneInterval(variof, 50, 400);
-      }
+    // if (vario <= 0 && vario >= BUZZERZEROCLIMB) {
+    //   if (!muted) {
+    //      playToneInterval(variof, 50, 400);
+    //   }
 
-    }
+    // }
     
-   if (vario <= double(conf.sinkAlarmLevel)/1000 ) { //sink alarm
-      if (!muted) {
-         playTwoToneInterval(1400, 1800, 100, 100);
-      }
-
-   }
+  //  if (vario <= double(conf.sinkAlarmLevel)/1000 ) { //sink alarm
+  //     if (!muted) {
+  //        playTwoToneInterval(1400, 1800, 100, 100);
+  //     }
+  //  }
 
 #if defined(BUZZSINKALERT) 
-    if (vario <=  BUZZSINKALERT && vario >= double(conf.sinkAlarmLevel)/1000 ) {
-       playTonePause(300, abs(vario), BUZZSINKALERTPAUSE);
+    if (vario <=  BUZZSINKALERT /* && vario >= double(conf.sinkAlarmLevel)/1000 */ ) {
+      // playTonePause(300, abs(vario), BUZZSINKALERTPAUSE);
+      
+      // ***************
+
+      float vario_fix = vario < -6 ? -6 : vario;
+      vario_fix += 6;
+
+      float variofa = (vario_fix * 20 ) + 150;
+      playToneContinuous(variofa);
+      
+      // ***************
+
     }
   
 #endif
@@ -185,14 +215,14 @@ void makeVarioAudio(float vario) {
   variof = (10 * variof + variofa) / 11 ;
 
   if (vario > 0) {
-    pulse = TOPPULSE / (vario * 10) + 100;
+    pulse = TOPPULSE / (vario * 10) + 200;
     if (!muted) {
       playToneInterval(variof, pulse, pulse / 2);
     }
     climbing = true;
   } else {
     if (climbing ) { //dropped out of the thermal
-      tone(BUZZPIN, 100, OUTOFTHERMALBUZZT);
+      // tone(BUZZPIN, 100, OUTOFTHERMALBUZZT);
       climbing = false;
     }
   }

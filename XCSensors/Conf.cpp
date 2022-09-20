@@ -62,14 +62,14 @@ void getDefaultConfig() {
   conf.qnePressure = 101325;
 
   // X 1000 Level to sound sink alarm
-  conf.sinkAlarmLevel = -5000;
+  conf.sinkAlarmLevel = -2000;
 
   //send data via serial port
   conf.SerialOut = true;
 
   //send data via bluetooth. BT uses alot of power if not linked. Better to disable if not used.
   //BT will be available during startup, if the config menu is used, it will not be disabled.
-  conf.SerialOutBT = true;
+  conf.SerialOutBT = false;
 
   //send data via attached ESP
   conf.SerialOutESP = false;
@@ -87,10 +87,10 @@ void getDefaultConfig() {
   conf.pcprobe = true;
 
   //use custom nmea sentence
-  conf.xcs = false;
+  conf.xcs = true;
 
   //low pass filter, the higher the number the slower the raw vario reading changes.
-  conf.variosmooth = 15;
+  conf.variosmooth = 10;
 
   // turn vario audio on or off
   conf.buzzer = true;
@@ -114,7 +114,7 @@ void getDefaultConfig() {
   conf.advMaxSmooth = 30;
 
   // x1000 Glider sink rate
-  conf.gliderSinkRate = -900;
+  conf.gliderSinkRate = -800;
 }
 
 #if defined (SERIAL_CONFIG)
@@ -386,7 +386,7 @@ void getConfVal(char c) {
   static bool split = false;
   q = c;
 
-  if (!cmd)                                              // '<'
+  if (!cmd)                                              // ''
   {
     i = 0;
     y = 0;
@@ -412,13 +412,13 @@ void getConfVal(char c) {
     }
   }
 
-  if (q == 0x0d) { // enter
+  if (q == 0x0a) { // enter \n
     flag = true;
     i = 0;
     y = 0;
     cmd = false;
   }
-  //Serial.print(c);
+  Serial.print(c);
   if (flag) {
     flag = false;
     split = false;
@@ -479,7 +479,6 @@ void getConfVal(char c) {
     setConf(atoi(Confbuffer), Valbuffer);
     memset(Confbuffer, 0, sizeof(Confbuffer));
     memset(Valbuffer, 0, sizeof(Valbuffer));
-
   }
 
 }

@@ -52,12 +52,12 @@
 
 //#define GPSSERIALEVENT serialEvent2 //use SerialEvent(). Carefull as this might interupt other nmea sentences
 
-#define TAKEOFFVARIO 0.8 //0.4 //abs vario level to detect takeoff
-#define BUZZERZEROCLIMB -0.3 // Normal sink rate for glider is -0.9 m/s. At this value up to 0 m/s a "blip" sound is made
-#define BUZZSINKALERT -2 //Alert if sinking harder than normal
+#define TAKEOFFVARIO 0.4 //0.4 //abs vario level to detect takeoff
+// #define BUZZERZEROCLIMB -0.3 // Normal sink rate for glider is -0.9 m/s. At this value up to 0 m/s a "blip" sound is made
+#define BUZZSINKALERT -0.3 //Alert if sinking harder than normal
 #define BUZZSINKALERTPAUSE 8000 //pause length in between alerts
 #define BUZZERVARIOSTOP 10000 //time vario STOP making noise when climbrate 0 m/s 
-//#define TESTBUZZER  //simulate the vario sound for testing only (Carefull, you might go mad)
+// #define TESTBUZZER  //simulate the vario sound for testing only (Carefull, you might go mad)
 #define OUTOFTHERMALBUZZT 3000 //time buzzer goes buuhhhhh
 
 #define VARIO2LEASTDEV //base dual vario on least deviation
@@ -72,7 +72,7 @@
 
 #define ACCLREADMS 100 //how often to read the accelerom
 #define ACCLSMOOTH 10 //Lowpass filter level
-#define ACCLOFFSET -0.93 //finetune Accl offset (includes -1G for gravity)
+#define ACCLOFFSET 0//-0.93 //finetune Accl offset (includes -1G for gravity)
 
 //#define ALLFASTDATA //send all data at 10Hz. DMA channels reccomended
 
@@ -129,7 +129,7 @@
 #define GPS
 #define SERIALGPSBAUD 9600
 #define VARIO
-//#define VARIO2 //if 2nd vario
+#define VARIO2 //if 2nd vario
 
 #define BAROADDR 0x76
 #define BAROADDR2 0x77
@@ -144,12 +144,12 @@
 //#define WIFISSID "XCSensors01" // change this
 //#define WIFIPASSWORD "thereisnospoon"
 
-#define DHTH //ACCL rewuired i.c.w. cprobe
+// #define DHTH //ACCL rewuired i.c.w. cprobe
 #define DHT_PIN PB1
 #define DHTOFFSET 0 //calibrate sensor
 
 
-#define ACCL  
+#define ACCL
 
 /* set HC-05 in sleep mode (via BTPINENABLE) after startup
   if the stop command is sent during startup, it will delay the sleep mode
@@ -169,78 +169,78 @@
 
 #endif
 
-/////////////////////////////////////////////////////////////////////
-//STM32F Wifi Box
-/////////////////////////////////////////////////////////////////////
-#if defined(WIFIBOX_BT)
+// /////////////////////////////////////////////////////////////////////
+// //STM32F Wifi Box
+// /////////////////////////////////////////////////////////////////////
+// #if defined(WIFIBOX_BT)
 
-//#define CONFIGOPT //enable configuration option (EEPROM required)
-//#define I2CEEPROM 0x50 ////External I2C EEPROM, required if using CONFIGOPT on STM32F 
-//#define I2CEEPROMPAGE 64 // page size of EEPROM 128 for 512
+// //#define CONFIGOPT //enable configuration option (EEPROM required)
+// //#define I2CEEPROM 0x50 ////External I2C EEPROM, required if using CONFIGOPT on STM32F 
+// //#define I2CEEPROMPAGE 64 // page size of EEPROM 128 for 512
 
-#define LEDPIN PC13 // PC13 - blue pill
+// #define LEDPIN PC13 // PC13 - blue pill
 
-#define SERIAL_CONFIG Serial //the serial port for remote config options
-#define SERIAL_CONFIG_BAUD  115200 //only define if SERIAL_CONFIG uses it's own port
-
-
-//SerialOut means data will be sent from that port. It needs to be set to a harware serial port.
-//Best practice is only to send out to ports you will actually use.
-
-//#define SERIALOUT Serial1
-//#define SERI ALOUT_BAUD 115200  //do not use with Serial (USB) it will hang
-
-//#define SERIALOUTBT Serial3 //Bluetooth without AT commands Serial out
-//#define SERIALOUTBT_BAUD 115000 //38400  //do not use with Serial (USB) it will hang
-
-#define SERIALOUTUSB  Serial //USB output. Usually no baud rate needed
-
-#define SERIALGPS Serial2
-#define GPS
-#define SERIALGPSBAUD 9600 // serial1 speed
-
-#define VARIO
-//#define VARIO2 //if 2nd vario
-#define BAROADDR 0x77
-//#define BAROADDR2 0x76
+// #define SERIAL_CONFIG Serial //the serial port for remote config options
+// #define SERIAL_CONFIG_BAUD  115200 //only define if SERIAL_CONFIG uses it's own port
 
 
-//#define ESPWIFI 
-//#define SERIALESP Serial3
-//#define ESPAT  //use AT commands
-//#define SERIALESPBAUD 115200 
-//#define WIFIEN_PIN 12 //wifi enable pin 
+// //SerialOut means data will be sent from that port. It needs to be set to a harware serial port.
+// //Best practice is only to send out to ports you will actually use.
 
-//#define WIFISSID "XCSensors" // change this 
-//#define WIFIPASSWORD "thereisnospoon"
+// //#define SERIALOUT Serial1
+// //#define SERI ALOUT_BAUD 115200  //do not use with Serial (USB) it will hang
 
-#define DHTH //Curren lib autodetect sensor
-#define DHT_PIN PB1
-#define DHTOFFSET 0 //calibrate sensor
+// //#define SERIALOUTBT Serial3 //Bluetooth without AT commands Serial out
+// //#define SERIALOUTBT_BAUD 115000 //38400  //do not use with Serial (USB) it will hang
 
+// #define SERIALOUTUSB  Serial //USB output. Usually no baud rate needed
 
-//#define ACCL
+// #define SERIALGPS Serial2
+// #define GPS
+// #define SERIALGPSBAUD 9600 // serial1 speed
 
-
-/* set HC-05 in sleep mode (via BTPINENABLE) after startup
-  if the stop command is sent during startup, it will delay the sleep mode
-  until start command.
-*/
-//#define BTENPIN 2 //pin to enable HC-05
-//#define BTSLEEP  //enable sleep mode
-/*Program the HC-05/06 via AT commands first (use the ftdi, press the use prog button, program baud is always 38400)
-  AT+UART=38400,1,0 //115200 had problems
-  AT+NAME=iXsensors0A
-  AT+PSWD=1234
-*/
+// #define VARIO
+// //#define VARIO2 //if 2nd vario
+// #define BAROADDR 0x77
+// //#define BAROADDR2 0x76
 
 
-#define BUZZER //let's go beep
-#define BUZZPIN PB0 //board pin 
+// //#define ESPWIFI 
+// //#define SERIALESP Serial3
+// //#define ESPAT  //use AT commands
+// //#define SERIALESPBAUD 115200 
+// //#define WIFIEN_PIN 12 //wifi enable pin 
+
+// //#define WIFISSID "XCSensors" // change this 
+// //#define WIFIPASSWORD "thereisnospoon"
+
+// #define DHTH //Curren lib autodetect sensor
+// #define DHT_PIN PB1
+// #define DHTOFFSET 0 //calibrate sensor
+
+
+// //#define ACCL
+
+
+// /* set HC-05 in sleep mode (via BTPINENABLE) after startup
+//   if the stop command is sent during startup, it will delay the sleep mode
+//   until start command.
+// */
+// //#define BTENPIN 2 //pin to enable HC-05
+// //#define BTSLEEP  //enable sleep mode
+// /*Program the HC-05/06 via AT commands first (use the ftdi, press the use prog button, program baud is always 38400)
+//   AT+UART=38400,1,0 //115200 had problems
+//   AT+NAME=iXsensors0A
+//   AT+PSWD=1234
+// */
+
+
+// #define BUZZER //let's go beep
+// #define BUZZPIN PB0 //board pin 
 
 
 
-#endif //WIFIBOX
+// #endif //WIFIBOX
 
 
 
@@ -249,154 +249,154 @@
 ////////////////////////////
 
 
-#elif defined(TEENSY)
+// #elif defined(TEENSY)
 
-/////////////////////////////////////////////////////////////////////
-//TEENSY Kobo Integrated
-/////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////
+// //TEENSY Kobo Integrated
+// /////////////////////////////////////////////////////////////////////
 
-#if defined(KOBO_BT)
-#define CONFIGOPT //enable configuration option (EEPROM required)
-//#define I2CEEPROM 0x50 //External I2C EEPROM
-//#define I2CEEPROMPAGE 64 // page size of EEPROM 128 for 512
-
-
-
-#define LEDPIN 13
-
-#define SERIAL_CONFIG Serial3 //the serial port for remote config options
-#define SERIAL_CONFIG_BAUD  115200 //only define if SERIAL_CONFIG is not sharing with a SERIALOUT* type port 
-
-//SerialOut means data will be sent from that port. It needs to be set to a harware serial port.
-//Best practice is only to send out to ports you will actually use.
-
-#define SERIALOUT Serial1 //Serial1=kobo
-#define SERIALOUT_BAUD 115200 //38400  //do not use with Serial (USB) it will hang
-
-#define SERIALOUTBT Serial3 //Bluetooth without AT commands Serial out
-#define SERIALOUTBT_BAUD 115200 //38400  //do not use with Serial (USB) it will hang
-
-//#define SERIALUSB Serial //USB output
-
-#define SERIALGPS Serial2
-#define GPS
-#define SERIALGPSBAUD 115200
-
-#define VARIO
-#define VARIO2 //if 2nd vario
-
-#define BAROADDR 0x77
-#define BAROADDR2 0x76
-
-
-//#define ESPWIFI
-//#define SERIALESP Serial3
-//#define ESPAT  //use AT commands
-//#define SERIALESPBAUD 115200 
-///#define WIFIEN_PIN 12 //wifi enable pin 
-
-//#define WIFISSID "XCSensors01" // change this
-//#define WIFIPASSWORD "thereisnospoon"
-
-#define DHTH;
-#define DHT_PIN 17
-#define DHTOFFSET 50 //calibrate sensor
-
-
-#define ACCL
+// #if defined(KOBO_BT)
+// #define CONFIGOPT //enable configuration option (EEPROM required)
+// //#define I2CEEPROM 0x50 //External I2C EEPROM
+// //#define I2CEEPROMPAGE 64 // page size of EEPROM 128 for 512
 
 
 
-/* set HC-05 in sleep mode (via BTPINENABLE) after startup
-  if the stop command is sent during startup, it will delay the sleep mode
-  until start command.
-*/
-#define BTENPIN 2 //pin to enable HC-05
-#define BTSLEEP  //enable sleep mode
-/*Program the HC-05/06 via AT commands first (use the ftdi, press the use prog button, program baud is always 38400)
-  AT+UART=38400,1,0 //115200 had problems
-  AT+NAME=iXsensors0A
-  AT+PSWD=1234
-*/
+// #define LEDPIN 13
 
-#define BUZZER //let's go beep
-#define BUZZPIN 16 //board pin 
+// #define SERIAL_CONFIG Serial3 //the serial port for remote config options
+// #define SERIAL_CONFIG_BAUD  115200 //only define if SERIAL_CONFIG is not sharing with a SERIALOUT* type port 
 
+// //SerialOut means data will be sent from that port. It needs to be set to a harware serial port.
+// //Best practice is only to send out to ports you will actually use.
 
-#endif
+// #define SERIALOUT Serial1 //Serial1=kobo
+// #define SERIALOUT_BAUD 115200 //38400  //do not use with Serial (USB) it will hang
 
-/////////////////////////////////////////////////////////////////////
-//TEENSY Wifi Box
-//
-/////////////////////////////////////////////////////////////////////
-#if defined(WIFIBOX_BT)
-#define CONFIGOPT //enable configuration option (EEPROM required)
-//#define I2CEEPROM 0x50 //External I2C EEPROM
-//#define I2CEEPROMPAGE 64 // page size of EEPROM 128 for 512
+// #define SERIALOUTBT Serial3 //Bluetooth without AT commands Serial out
+// #define SERIALOUTBT_BAUD 115200 //38400  //do not use with Serial (USB) it will hang
 
+// //#define SERIALUSB Serial //USB output
+
+// #define SERIALGPS Serial2
+// #define GPS
+// #define SERIALGPSBAUD 115200
+
+// #define VARIO
+// // #define VARIO2 //if 2nd vario
+
+// #define BAROADDR 0x77
+// #define BAROADDR2 0x76
 
 
-#define SERIAL_CONFIG Serial //the serial port for remote config options
-//#define SERIAL_CONFIG_BAUD  115200 //only define if SERIAL_CONFIG uses it's own port
-#define LEDPIN 13
+// //#define ESPWIFI
+// //#define SERIALESP Serial3
+// //#define ESPAT  //use AT commands
+// //#define SERIALESPBAUD 115200 
+// ///#define WIFIEN_PIN 12 //wifi enable pin 
 
-//SerialOut means data will be sent from that port. It needs to be set to a harware serial port.
-//Best practice is only to send out to ports you will actually use.
+// //#define WIFISSID "XCSensors01" // change this
+// //#define WIFIPASSWORD "thereisnospoon"
 
-//#define SERIALOUT Serial1
-//#define SERIALOUT_BAUD 115200  //do not use with Serial (USB) it will hang
-
-#define SERIALOUTBT Serial1 //Bluetooth without AT commands Serial out
-#define SERIALOUTBT_BAUD 38400 //38400  //do not use with Serial (USB) it will hang
-
-#define SERIALOUTUSB Serial //USB output. Usually no baud rate needed
-
-#define SERIALGPS Serial2
-#define GPS
-#define SERIALGPSBAUD 9600 // serial1 speed
-
-#define VARIO
-#define VARIO2 //if 2nd vario
-#define BAROADDR 0x77
-#define BAROADDR2 0x76
+// #define DHTH;
+// #define DHT_PIN 17
+// #define DHTOFFSET 50 //calibrate sensor
 
 
-#define ESPWIFI 
-#define SERIALESP Serial3
-#define ESPAT  //use AT commands
-#define SERIALESPBAUD 115200 
-#define WIFIEN_PIN 12 //wifi enable pin 
-
-#define WIFISSID "XCSensors" // change this 
-#define WIFIPASSWORD "thereisnospoon"
-
-#define DHTH 
-#define DHT_PIN 17
-#define DHTOFFSET 30 //calibrate sensor
-
-
-#define ACCL
-
-
-/* set HC-05 in sleep mode (via BTPINENABLE) after startup
-  if the stop command is sent during startup, it will delay the sleep mode
-  until start command.
-*/
-#define BTENPIN 2 //pin to enable HC-05
-#define BTSLEEP  //enable sleep mode
-/*Program the HC-05/06 via AT commands first (use the ftdi, press the use prog button, program baud is always 38400)
-  AT+UART=38400,1,0 //115200 had problems
-  AT+NAME=iXsensors0A
-  AT+PSWD=1234
-*/
-
-
-#define BUZZER //let's go beep
-#define BUZZPIN 16 //board pin 
+// #define ACCL
 
 
 
-#endif
+// /* set HC-05 in sleep mode (via BTPINENABLE) after startup
+//   if the stop command is sent during startup, it will delay the sleep mode
+//   until start command.
+// */
+// #define BTENPIN 2 //pin to enable HC-05
+// #define BTSLEEP  //enable sleep mode
+// /*Program the HC-05/06 via AT commands first (use the ftdi, press the use prog button, program baud is always 38400)
+//   AT+UART=38400,1,0 //115200 had problems
+//   AT+NAME=iXsensors0A
+//   AT+PSWD=1234
+// */
+
+// #define BUZZER //let's go beep
+// #define BUZZPIN 16 //board pin 
+
+
+// #endif
+
+// /////////////////////////////////////////////////////////////////////
+// //TEENSY Wifi Box
+// //
+// /////////////////////////////////////////////////////////////////////
+// #if defined(WIFIBOX_BT)
+// #define CONFIGOPT //enable configuration option (EEPROM required)
+// //#define I2CEEPROM 0x50 //External I2C EEPROM
+// //#define I2CEEPROMPAGE 64 // page size of EEPROM 128 for 512
+
+
+
+// #define SERIAL_CONFIG Serial //the serial port for remote config options
+// //#define SERIAL_CONFIG_BAUD  115200 //only define if SERIAL_CONFIG uses it's own port
+// #define LEDPIN 13
+
+// //SerialOut means data will be sent from that port. It needs to be set to a harware serial port.
+// //Best practice is only to send out to ports you will actually use.
+
+// //#define SERIALOUT Serial1
+// //#define SERIALOUT_BAUD 115200  //do not use with Serial (USB) it will hang
+
+// #define SERIALOUTBT Serial1 //Bluetooth without AT commands Serial out
+// #define SERIALOUTBT_BAUD 38400 //38400  //do not use with Serial (USB) it will hang
+
+// #define SERIALOUTUSB Serial //USB output. Usually no baud rate needed
+
+// #define SERIALGPS Serial2
+// #define GPS
+// #define SERIALGPSBAUD 9600 // serial1 speed
+
+// #define VARIO
+// // #define VARIO2 //if 2nd vario
+// #define BAROADDR 0x77
+// #define BAROADDR2 0x76
+
+
+// #define ESPWIFI 
+// #define SERIALESP Serial3
+// #define ESPAT  //use AT commands
+// #define SERIALESPBAUD 115200 
+// #define WIFIEN_PIN 12 //wifi enable pin 
+
+// #define WIFISSID "XCSensors" // change this 
+// #define WIFIPASSWORD "thereisnospoon"
+
+// #define DHTH 
+// #define DHT_PIN 17
+// #define DHTOFFSET 30 //calibrate sensor
+
+
+// #define ACCL
+
+
+// /* set HC-05 in sleep mode (via BTPINENABLE) after startup
+//   if the stop command is sent during startup, it will delay the sleep mode
+//   until start command.
+// */
+// #define BTENPIN 2 //pin to enable HC-05
+// #define BTSLEEP  //enable sleep mode
+// /*Program the HC-05/06 via AT commands first (use the ftdi, press the use prog button, program baud is always 38400)
+//   AT+UART=38400,1,0 //115200 had problems
+//   AT+NAME=iXsensors0A
+//   AT+PSWD=1234
+// */
+
+
+// #define BUZZER //let's go beep
+// #define BUZZPIN 16 //board pin 
+
+
+
+// #endif
 
 #endif //TEENSY
 ////////////////////Set Configuration logic/////////////////////////

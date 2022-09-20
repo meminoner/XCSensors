@@ -31,12 +31,13 @@ void NMEA::setGforce(float gforce) { //$FBG does not exist, unable to find a gfo
       2) Checksum
   */
 
-  char t_NmeaAgforce[15] = "$XCSG,";
+  char t_NmeaAgforce[15] = "$XCTOD,";
   char t_gforce[5];
-  // char t_tail[2] = ",";
+  char t_tail[2] = ",";
 
-  dtostrf(gforce, 2, 2, t_gforce);
+  dtostrf(gforce, 2, 1, t_gforce);
   strcat(t_NmeaAgforce, t_gforce );
+  strcat(t_NmeaAgforce, t_tail);
   strcat(t_NmeaAgforce, "*");
   getCRC(t_NmeaAgforce);
   strcat(t_NmeaAgforce, t_check);
@@ -100,9 +101,14 @@ void NMEA::setnmeaVarioLXWP0(double varioAlt, float a, float b, float c, float d
   // 11 windspeed [km/h] (not used in LX1600)
   //
   // e.g.:
-  // $LXWP0,Y,222.3,1665.5,1.71,,,,,,239,174,10.1
+  // $LXWP0,Y,222.3    ,1665.5 ,1.71 ,,,,,,239,174,10.1
+  // $LXWP0, ,IAS(km/h),baroalt,vario,    ,    ,    ,    ,    ,,,
+  // $LXWP0, ,45.1     ,167.77 ,0.00 ,0.00,0.08,0.08,0.08,0.08,,,*23
+  // $PDGFTL1, QNE m, QNH m, vario cm/s, netto vario , IAS km/h, L/D ground tens, wind speed km/h , wind dir, volt battery hundreds, *chksum
+  // $PDGFTL1, 150.15,150.12,0.0,0.0,45.1,10,0.0,0.0,720,
 
   char t_nmeaVarioLXWP0[60] = "$LXWP0,N,,";
+  // char t_nmeaVarioLXWP0[60] = "$PDGFTL1,150.15,150.12,0.0,0.0,45.1,10,0.0,0.0,720,";
   char t_vario[5];
   char t_alt[9];
 

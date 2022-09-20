@@ -1,6 +1,4 @@
-
-/*
-  XCSensors http://XCSensors.org
+/*   XCSensors http://XCSensors.org
   
   Copyright (c), PrimalCode (http://www.primalcode.org)
 
@@ -8,16 +6,14 @@
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   any later version. see <http://www.gnu.org/licenses/>
-*/
-
-
+ */
+#include "config.h"
 #include <Arduino.h>
 #include "XCSensors.h"
 #include <TimedAction.h>
-#include <HardWire.h>
+#include <Wire.h>
 #include <DHT.h>
-#include <MPU6050.h> //3*  //need to change to DMA or HWire
-#include "config.h"
+#include <MPU6050.h>  //3*  //need to change to DMA or HWire
 #include <MS5611.h>
 #include "Conf.h"
 #include "SubFunctions.h"
@@ -46,8 +42,8 @@ conf_t conf;
 bool runloop = true;
 bool startwait = false;
 bool takeoff = false;
-int32_t realPressureAv = 1; //x100 usable stabalized reading (This is used to calculate vario)
-int32_t rawPressurePrev = 0; //previous direct reading
+int32_t realPressureAv = 1;   //x100 usable stabalized reading (This is used to calculate vario)
+int32_t rawPressurePrev = 0;  //previous direct reading
 int32_t rawPressurePrev2 = 0;
 double previousAltitude;
 double vario = 0;
@@ -57,7 +53,7 @@ int16_t ax, ay, az;
 int16_t gx, gy, gz;
 int16_t aax, aay, aaz;
 int16_t vectoraz;
-float acclOffset=0;
+float acclOffset = 0;
 #endif
 
 byte gi = 0;
@@ -71,14 +67,14 @@ byte dhthumidity = 0;
 // Class Loaders
 //----------------------------------------------------------------------------//
 
-HardWire HWire(1, I2C_FAST_MODE); // I2c1
+TwoWire HWire(1, I2C_FAST_MODE);  // I2c1
 
-TimedAction timedNmea10 = TimedAction(100, collectNmea10); // 10 times per second
+TimedAction timedNmea10 = TimedAction(100, collectNmea10);  // 10 times per second
 
 #if defined(VARIO)
 Average<float> nmea_varioave(10);
-Average<float> nmea_altitudeave(10); //Used for calculating vario
-TimedAction readVario = TimedAction(VARIOREADMS, readVarioPressure); //processor to fast.
+Average<float> nmea_altitudeave(10);                                  //Used for calculating vario
+TimedAction readVario = TimedAction(VARIOREADMS, readVarioPressure);  //processor to fast.
 
 MS5611 baro(BAROADDR);
 #if defined(VARIO2)
@@ -91,7 +87,7 @@ DHT dht;
 #endif
 
 #if defined(ACCL)
-TimedAction readACCL = TimedAction(ACCLREADMS, readACCLSensor); //processor to fast
+TimedAction readACCL = TimedAction(ACCLREADMS, readACCLSensor);  //processor to fast
 MPU6050 accelgyro;
 #endif
 
@@ -118,13 +114,13 @@ void ledOff() {
    Sensor readings are processed at different timed actions
    this function collects that data.
 */
-void collectNmea10() { //runs every 100ms
+void collectNmea10() {  //runs every 100ms
 #if defined(VARIO)
 
-  double realAltitude = baro.getAltitude( realPressureAv, conf.qnePressure); //Based on QN
+  double realAltitude = baro.getAltitude(realPressureAv, conf.qnePressure);  //Based on QN
 
   nmea_altitudeave.push(realAltitude);
-  
+
   if (nmea_altitudeave.getCount() > 9) {
     vario = nmea_altitudeave.get(9) - nmea_altitudeave.get(0);
   } else {
@@ -132,15 +128,14 @@ void collectNmea10() { //runs every 100ms
   }
   nmea_varioave.push(vario);
 
-  
-  // Direct call to send ptas1, without deadband
-  if (conf.ptas1) { 
-    nmea.setPTAS1(vario, varioAv, realAltitude); 
-    sendPTAS1();
-   
-  }   
 
-  
+  // Direct call to send ptas1, without deadband
+  if (conf.ptas1) {
+    nmea.setPTAS1(vario, varioAv, realAltitude);
+    sendPTAS1();
+  }
+
+
 
   checkAdaptiveVario(vario);
 
@@ -148,7 +143,7 @@ void collectNmea10() { //runs every 100ms
   previousAltitude = realAltitude;
 #endif
   //get ACCL
-#if defined (ACCL)
+#if defined(ACCL)
   aax = (ACCLSMOOTH * aax + ax) / (ACCLSMOOTH + 1);
   aay = (ACCLSMOOTH * aay + ay) / (ACCLSMOOTH + 1);
   aaz = (ACCLSMOOTH * aaz + az) / (ACCLSMOOTH + 1);
@@ -163,7 +158,7 @@ void collectNmea10() { //runs every 100ms
 #if !defined(GPSTIMER)
 
   gi++;
-  if (gi > 4) { // 5 samples collected
+  if (gi > 4) {  // 5 samples collected
     ledOn();
     getSlowSensorData();
     sendNmeaAll();
@@ -173,20 +168,17 @@ void collectNmea10() { //runs every 100ms
 #endif
 
 #endif
-
-
-
 }
 
 void readACCLSensor() {
 #if defined(ACCL)
-  accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);  
+  accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 #endif
 }
 
 void resetACCLcompVal() {
 #if defined(ACCL)
-  acclOffset = -(vectoraz * 1000 / 2048 )/1000 + ACCLOFFSET;
+  acclOffset = -(vectoraz * 1000 / 2048) / 1000 + ACCLOFFSET;
 #endif
 }
 
@@ -206,24 +198,23 @@ void initSensors() {
 
 #endif
 
-#if defined (DHTH)
+#if defined(DHTH)
   dht.setup(DHT_PIN);
 #endif
 
 #if defined(ACCL)
   //Accelerometer - needed for the gy-86 board
   accelgyro.setI2CMasterModeEnabled(false);
-  accelgyro.setI2CBypassEnabled(true) ;
+  accelgyro.setI2CBypassEnabled(true);
   accelgyro.setSleepEnabled(false);
   accelgyro.initialize();
   accelgyro.setFullScaleAccelRange(MPU6050_ACCEL_FS_16);
 #endif
-
 }
 
 
 #if defined(GPS) && defined(GPSSERIALEVENT)
-void GPSSERIALEVENT() { //Builtin Arduino Function
+void GPSSERIALEVENT() {  //Builtin Arduino Function
   if (startwait && runloop) {
     ledOn();  //Led On
 
@@ -232,7 +223,7 @@ void GPSSERIALEVENT() { //Builtin Arduino Function
       GPSstuff(inChar);
     }
 
-    ledOff(); //Led Off
+    ledOff();  //Led Off
   }
 }
 #endif
@@ -243,7 +234,7 @@ void GPSSERIALEVENT() { //Builtin Arduino Function
    before calling sendNmeaAll.
 */
 
-void getSlowSensorData() { //Sensor data not needed every 100ms
+void getSlowSensorData() {  //Sensor data not needed every 100ms
 #if defined(VARIO)
   varioAv = nmea_varioave.mean();
   if (conf.lxnav) {
@@ -252,24 +243,23 @@ void getSlowSensorData() { //Sensor data not needed every 100ms
     nmea.setNmeaVarioSentence(realPressureAv, previousAltitude, varioAv, baro.getTemperature(), 0 / 1000);
   }
 #endif
-#if defined (ACCL)
-  float gforce = float((vectoraz * 1000) / 2048)/1000 + acclOffset; //x1000 to prevent values smaller than 0.01 being discarded 
+#if defined(ACCL)
+  float gforce = float((vectoraz * 1000) / 2048) / 1000 + acclOffset;  //x1000 to prevent values smaller than 0.01 being discarded
   nmea.setGforce(gforce);
 #endif
 
-#if defined (DHTH)
+#if defined(DHTH)
   dhttemperature = dht.getTemperature();
   dhthumidity = dht.getHumidity();
   dhthumidity += DHTOFFSET;
 #endif
 
-#if defined(ACCL) && defined(DHTH) // kind of a requirement
- //Send C-probe data
- 
-   nmea.setNmeaPcProbeSentence(float((aax * 1000) / 2048)/1000 , float((aay * 1000) / 2048)/1000, float((aaz * 1000) / 2048)/1000, dhttemperature, dhthumidity, 0);  
-   sendPcProbe();
-#endif
+#if defined(ACCL) && defined(DHTH)  // kind of a requirement
+                                    //Send C-probe data
 
+  nmea.setNmeaPcProbeSentence(float((aax * 1000) / 2048) / 1000, float((aay * 1000) / 2048) / 1000, float((aaz * 1000) / 2048) / 1000, dhttemperature, dhthumidity, 0);
+  sendPcProbe();
+#endif
 }
 
 /*
@@ -284,26 +274,27 @@ void readVarioPressure() {
 #if defined(VARIO)
   int32_t pressure;
   pressure = baro.getPressure();
-
+  // Serial.println("Vario1:");
+  // Serial.println(pressure);
 #if defined(VARIO2)
   int32_t pressure2;
   int32_t pressure1t;
   int32_t pressure2t;
   pressure2 = baro_2.getPressure();
-
+  // Serial.println("Vario2:");
+  // Serial.println(pressure2);
 #if defined(VARIO2LEASTDEV)
   int32_t diff = rawPressurePrev - pressure;
   int32_t diff2 = rawPressurePrev2 - pressure2;
 
   //alter the sensor reading
-  if (fabs(diff) > fabs(diff2)) { //if the primary has more deviation use the deviation of the secondary sensor
-    pressure1t =  rawPressurePrev + diff2;
+  if (fabs(diff) > fabs(diff2)) {  //if the primary has more deviation use the deviation of the secondary sensor
+    pressure1t = rawPressurePrev + diff2;
     pressure2t = pressure2;
 
   } else {
     pressure2t = rawPressurePrev2 + diff;
     pressure1t = pressure;
-
   }
   rawPressurePrev = pressure;
   rawPressurePrev2 = pressure2;
@@ -324,11 +315,10 @@ void readVarioPressure() {
 //also fire the buzzer
 #if defined(BUZZER)
 
-    if (takeoff) { 
-        makeVarioAudio(vario);
-     }
+  if (takeoff && conf.buzzer) {
+    makeVarioAudio(vario);
+  }
 #endif
-
 }
 
 void runOnce() {
@@ -338,7 +328,7 @@ void runOnce() {
 #endif
 #if defined(BTSLEEP)
     if (runloop && !conf.SerialOutBT) {
-      digitalWrite(BTENPIN, LOW); //Make BT go ZZ
+      digitalWrite(BTENPIN, LOW);  //Make BT go ZZ
     }
 #endif
   }
@@ -346,19 +336,42 @@ void runOnce() {
 }
 
 
+
+//----------------------------------------------------------------------------//
+// GPS Settings
+//----------------------------------------------------------------------------//
+
+const unsigned char ubxRate5Hz[] PROGMEM = { 0x06, 0x08, 0x06, 0x00, 200, 0x00, 0x01, 0x00, 0x01, 0x00 };
+
+void Send_GPS_Settings(const unsigned char *progmemBytes, size_t len) {
+  SERIALGPS.write(0xB5);  // SYNC1
+  SERIALGPS.write(0x62);  // SYNC2
+
+  uint8_t a = 0, b = 0;
+  while (len-- > 0) {
+    uint8_t c = pgm_read_byte(progmemBytes++);
+    a += c;
+    b += a;
+    SERIALGPS.write(c);
+  }
+
+  SERIALGPS.write(a);  // CHECKSUM A
+  SERIALGPS.write(b);  // CHECKSUM B
+}
+
 //----------------------------------------------------------------------------//
 // Setup
 //----------------------------------------------------------------------------//
 
 
 void setup() {
-  
+
 #if defined(DEBUG)
   DEBUGSERIAL.println("Setup phase");
 #endif
-  Wire.begin(); 
+  Wire.begin();
 
-  pinMode(LEDPIN, OUTPUT); //LED
+  pinMode(LEDPIN, OUTPUT);  //LED
   ledOn();
 #if defined(SERIALOUT_BAUD)
   SERIALOUT.begin(SERIALOUT_BAUD);
@@ -369,10 +382,14 @@ void setup() {
 #endif
 
 #if defined(GPS)
-  SERIALGPS.begin(SERIALGPSBAUD); //for the gps
+  SERIALGPS.begin(SERIALGPSBAUD);  //for the gps
+  delay(100);
+  Send_GPS_Settings(ubxRate5Hz, sizeof(ubxRate5Hz));
 #endif
 
- 
+
+
+
 #if defined(SERIALESP)
 #if defined(WIFIEN_PIN)
   pinMode(WIFIEN_PIN, OUTPUT);
@@ -381,9 +398,9 @@ void setup() {
   } else {
     digitalWrite(WIFIEN_PIN, LOW);
   }
-#endif //WIFIEN_PIN
-  SERIALESP.begin(SERIALESPBAUD); //need for speed
-#endif //ESPWIFI
+#endif                             //WIFIEN_PIN
+  SERIALESP.begin(SERIALESPBAUD);  //need for speed
+#endif                             //ESPWIFI
 
 
 #if defined(BTENPIN)
@@ -401,15 +418,15 @@ void setup() {
   getDefaultConfig();
 #endif
 
-  
+
   initSensors();
 
 #if defined(ESPAT)
- setSendDataMultiCast();
+  setSendDataMultiCast();
 #endif
 
 
-  ledOff(); //If the led stays on, the sensors failed to init
+  ledOff();  //If the led stays on, the sensors failed to init
   //vRef.begin(VREFCAL);
 #if defined(DEBUG)
   Serial.println("Finished Setup phase");
@@ -422,20 +439,19 @@ void setup() {
 //----------------------------------------------------------------------------//
 
 void loop() {
- // long loopstart = micros(); //for testing
+  // long loopstart = micros(); //for testing
   long startTime = millis();
 
-  if ( startTime > STARTDELAY) {    //
+  if (startTime > STARTDELAY) {  //
     startwait = true;
     runOnce();
-    
   }
 
 
-  if (!startwait) { //init the tables so it won't shock the system
+  if (!startwait) {  //init the tables so it won't shock the system
 #if defined(VARIO)
-    readVarioPressure();   
-    int32_t alt =   baro.getAltitude( realPressureAv, conf.qnePressure);    
+    readVarioPressure();
+    int32_t alt = baro.getAltitude(realPressureAv, conf.qnePressure);
     nmea_altitudeave.push(alt);
 #endif
 #if defined(ACCL)
@@ -447,13 +463,12 @@ void loop() {
   if (SERIAL_CONFIG.available()) {
     char inChar = SERIAL_CONFIG.read();
     getConfVal(inChar);
-   
   }
 #endif
 
   if (startwait && runloop) {  //Give the sensors time to warm up
 
-    
+
 #if defined(GPS) && !defined(GPSSERIALEVENT)
     if (SERIALGPS.available()) {
       char inChar = (char)SERIALGPS.read();
@@ -467,26 +482,25 @@ void loop() {
 
 #endif
 
-#if defined (ACCL)
+#if defined(ACCL)
     readACCL.check();
 #endif
 
 #if defined(TAKEOFFVARIO) && !defined(TESTBUZZER)
-    if ( startTime > STARTDELAY + 4000 && !takeoff) {
+    if (startTime > STARTDELAY + 4000 && !takeoff) {
       if (fabs(vario) > TAKEOFFVARIO) {
         takeoff = true;
       }
-
     }
 #else
-  takeoff = true;
+    takeoff = true;
 #endif
-
-
-
   }
 
-/*
+
+  // Serial.println(realPressureAv);
+
+  /*
 //Loop timer check (for debuging)
 Serial.println();
 Serial.print("Loop time: ");
