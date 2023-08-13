@@ -10,6 +10,8 @@
 */
 #include <Arduino.h>
 #include "NMEA.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 
 const char *hex = "0123456789ABCDEF";
@@ -21,7 +23,7 @@ NMEA::NMEA() {
 
 
 
-void NMEA::setGforce(float gforce) { //$FBG does not exist, unable to find a gforce NMEA sentence
+void NMEA::setGforce(float gforce, float airspeed) { //$FBG does not exist, unable to find a gforce NMEA sentence
 
   /* Haven't found a NMEA sentence for G-Force. This one is made up.
      $XCSG,0,*hh/CR/LF
@@ -33,10 +35,18 @@ void NMEA::setGforce(float gforce) { //$FBG does not exist, unable to find a gfo
 
   char t_NmeaAgforce[15] = "$XCTOD,";
   char t_gforce[5];
+  char t_airspeed[5];
   char t_tail[2] = ",";
 
   dtostrf(gforce, 2, 1, t_gforce);
   strcat(t_NmeaAgforce, t_gforce );
+
+  strcat(t_NmeaAgforce, t_tail);
+
+  sprintf(t_airspeed,"%d",(int)airspeed);
+  // dtostrf(airspeed, 2, 1, t_airspeed);
+  strcat(t_NmeaAgforce, t_airspeed);
+
   strcat(t_NmeaAgforce, t_tail);
   strcat(t_NmeaAgforce, "*");
   getCRC(t_NmeaAgforce);
@@ -44,6 +54,7 @@ void NMEA::setGforce(float gforce) { //$FBG does not exist, unable to find a gfo
 
   strcpy(nmeaGforce, t_NmeaAgforce);
 }
+
 
 
 void NMEA::setPTAS1(double vario, double varioAv, double realAltitude) {

@@ -114,14 +114,14 @@
 #define SERIALOUT Serial1 //Serial1=kobo
 #define SERIALOUT_BAUD 115200 //38400  //do not use with Serial (USB) it will hang
 
-//#define SERIALOUTBT Serial3 
-//#define SERIALOUTBT_BAUD 115200 //HM-13 user Serial passthrough to configure. Set terminal to No line ending (no /n /r)
+#define SERIALOUTBT Serial3 
+#define SERIALOUTBT_BAUD 115200 //HM-13 user Serial passthrough to configure. Set terminal to No line ending (no /n /r)
 //set name AT+NAMEXCSensors & AT+NAMBXCSensorsBLE
 //set dualmode AT+DUAL0
 //set role AT+ROLB0  //slave
 //set pin AT+PINE1234
 //set ble pin  AT+PINB000000
- //set low unconnected AT+PIO11
+//set low unconnected AT+PIO11
 
 #define SERIALOUTUSB  Serial //USB output
 

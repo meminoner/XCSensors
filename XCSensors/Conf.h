@@ -61,6 +61,7 @@ typedef struct {
   byte advMinSmooth;
   byte advMaxSmooth;
   int gliderSinkRate;
+  int speakerVolume;
  
 } conf_t;
 

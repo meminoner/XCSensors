@@ -115,6 +115,9 @@ void getDefaultConfig() {
 
   // x1000 Glider sink rate
   conf.gliderSinkRate = -800;
+
+  // Volume 0-1023
+  conf.speakerVolume = 1023;
 }
 
 #if defined (SERIAL_CONFIG)
@@ -266,6 +269,10 @@ void getConfigVars() { // order is not that important
   //
 }
 
+void setSpeakerVolume(int vol){
+  conf.speakerVolume = vol;
+}
+
 
 String getStringFromBool(bool bval) { //TODO: process Boolean values
   if (bval) {
@@ -359,6 +366,9 @@ void setConf(int varname, char *value) {
     case 102: getConfigFromEEPROM(); break; //load from eeprom
     case 106: resetACCLcompVal(); break; // quick set the ACCL to 0
     case 101: getConfigVars(); break; // get config for app
+    case 300: setSpeakerVolume(0); conf.buzzer = false; saveConfigToEEPROM(); break;
+    case 301: setSpeakerVolume(512); conf.buzzer = true; saveConfigToEEPROM(); break;
+    case 302: setSpeakerVolume(1023); conf.buzzer = true; saveConfigToEEPROM(); break;
     case 200: runloop = false; break; //stop
     case 201:
       runloop = true;

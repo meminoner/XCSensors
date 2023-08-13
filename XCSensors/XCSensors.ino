@@ -13,7 +13,8 @@
 #include <TimedAction.h>
 #include <Wire.h>
 #include <DHT.h>
-#include <MPU6050.h>  //3*  //need to change to DMA or HWire
+#include <MPU6050.h>   //3*  //need to change to DMA or HWire
+#include "Airspeed.h"  // Airspeed sensor
 #include <MS5611.h>
 #include "Conf.h"
 #include "SubFunctions.h"
@@ -56,6 +57,15 @@ int16_t vectoraz;
 float acclOffset = 0;
 #endif
 
+// Airspeed
+byte airspeed_status;  // A two bit field indicating the status of the I2C read
+uint16_t P_dat;        // 14 bit pressure data
+uint16_t T_dat;        // 11 bit temperature data
+float airspeed_psi=0;
+float airspeed=0;
+float a_airspeed=0;
+// ---------
+
 byte gi = 0;
 bool hasrun = false;
 #if defined(DHTH)
@@ -90,6 +100,9 @@ DHT dht;
 TimedAction readACCL = TimedAction(ACCLREADMS, readACCLSensor);  //processor to fast
 MPU6050 accelgyro;
 #endif
+
+
+
 
 
 //VoltageReference vRef = VoltageReference();
@@ -150,6 +163,11 @@ void collectNmea10() {  //runs every 100ms
   vectoraz = (sqrt(pow(aax, 2) + pow(aay, 2) + pow(aaz, 2))) - 1;
 #endif
 
+  
+a_airspeed = (3 * a_airspeed + airspeed) / (3 + 1);
+if(a_airspeed < 5.0){
+  a_airspeed = 0;
+}
 
 #if defined(ALLFASTDATA)
   getSlowSensorData();
@@ -174,6 +192,12 @@ void readACCLSensor() {
 #if defined(ACCL)
   accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 #endif
+
+  // Airspeed ***************************
+  airspeed_status = fetch_airspeed_pressure(P_dat, T_dat);
+  airspeed_psi = (((double)P_dat + 102.0 - (double)MS4525ZeroCounts) / ((double)MS4525Span)) * ((double)MS4525FullScaleRange);
+  airspeed_psi = abs(airspeed_psi);
+  airspeed = sqrt((airspeed_psi * 13789.5144) / 1.225) * 3.6 * 1.33; // 1.33 fix from "XFlight Pitot Test 01" https://docs.google.com/spreadsheets/d/1ojkgztMuq16dv106xkR8URYw6ougcalto2iCSpBHG_Y/edit
 }
 
 void resetACCLcompVal() {
@@ -245,7 +269,7 @@ void getSlowSensorData() {  //Sensor data not needed every 100ms
 #endif
 #if defined(ACCL)
   float gforce = float((vectoraz * 1000) / 2048) / 1000 + acclOffset;  //x1000 to prevent values smaller than 0.01 being discarded
-  nmea.setGforce(gforce);
+  nmea.setGforce(gforce, a_airspeed);
 #endif
 
 #if defined(DHTH)
@@ -254,7 +278,7 @@ void getSlowSensorData() {  //Sensor data not needed every 100ms
   dhthumidity += DHTOFFSET;
 #endif
 
-#if defined(ACCL) && defined(DHTH)  // kind of a requirement
+#if defined(ACCL) && defined(DHTH)  // kind of a requirement \
                                     //Send C-probe data
 
   nmea.setNmeaPcProbeSentence(float((aax * 1000) / 2048) / 1000, float((aay * 1000) / 2048) / 1000, float((aaz * 1000) / 2048) / 1000, dhttemperature, dhthumidity, 0);
@@ -431,7 +455,6 @@ void setup() {
 #if defined(DEBUG)
   Serial.println("Finished Setup phase");
 #endif
-
 }
 
 //----------------------------------------------------------------------------//
@@ -496,7 +519,6 @@ void loop() {
     takeoff = true;
 #endif
   }
-
 
   // Serial.println(realPressureAv);
 

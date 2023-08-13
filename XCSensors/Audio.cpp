@@ -45,32 +45,32 @@ float testvario = -6;
 
 
 // Non-Blocking beep blob beep
-void playTwoToneInterval(int freq,int freq2, int period, int intervald) {
+// void playTwoToneInterval(int freq,int freq2, int period, int intervald) {
  
   
-  if (toneOn) {
-    int wait = period + tm;
+//   if (toneOn) {
+//     int wait = period + tm;
     
     
-    if ( wait < millis()) {
-      toneOn = false;
-      noTone(BUZZPIN);
-      tone(BUZZPIN, freq2, intervald);
-      rm = millis();
-    }
+//     if ( wait < millis()) {
+//       toneOn = false;
+//       noTone(BUZZPIN);
+//       tone(BUZZPIN, freq2, intervald, conf.speakerVolume);
+//       rm = millis();
+//     }
 
-  } else {
-    int ndwait = intervald + rm;
+//   } else {
+//     int ndwait = intervald + rm;
      
-    if(ndwait < millis()) {
+//     if(ndwait < millis()) {
     
-    tone(BUZZPIN, freq, period);
-    toneOn = true;
-    tm = millis();
-    }
-  }
+//     tone(BUZZPIN, freq, period, conf.speakerVolume);
+//     toneOn = true;
+//     tm = millis();
+//     }
+//   }
 
-}
+// }
 
 
 
@@ -91,7 +91,7 @@ void playToneInterval(int freq, int period, int tinterval) {
     }
 
   } else {
-    tone(BUZZPIN, freq, period);
+    tone(BUZZPIN, freq, period/* , conf.speakerVolume */);
     toneOn = true;
     tm = millis();
   }
@@ -106,11 +106,11 @@ void playToneContinuous(int freq) {
     int wait = period + tm;
     if ( wait <= millis()) {
       toneOn = false;
-      tone(BUZZPIN, freq, 300);
+      tone(BUZZPIN, freq, 300/* , conf.speakerVolume */);
     }
 
   } else {
-    tone(BUZZPIN, freq, 300);
+    tone(BUZZPIN, freq, 300/*             */);
     toneOn = true;
     tm = millis();
   }
