@@ -69,7 +69,7 @@ void getDefaultConfig() {
 
   //send data via bluetooth. BT uses alot of power if not linked. Better to disable if not used.
   //BT will be available during startup, if the config menu is used, it will not be disabled.
-  conf.SerialOutBT = false;
+  conf.SerialOutBT = true;
 
   //send data via attached ESP
   conf.SerialOutESP = false;
@@ -117,7 +117,7 @@ void getDefaultConfig() {
   conf.gliderSinkRate = -800;
 
   // Volume 0-1023
-  conf.speakerVolume = 1023;
+  conf.speakerVolume = 128;
 }
 
 #if defined (SERIAL_CONFIG)
@@ -367,8 +367,10 @@ void setConf(int varname, char *value) {
     case 106: resetACCLcompVal(); break; // quick set the ACCL to 0
     case 101: getConfigVars(); break; // get config for app
     case 300: setSpeakerVolume(0); conf.buzzer = false; saveConfigToEEPROM(); break;
-    case 301: setSpeakerVolume(512); conf.buzzer = true; saveConfigToEEPROM(); break;
-    case 302: setSpeakerVolume(1023); conf.buzzer = true; saveConfigToEEPROM(); break;
+    case 301: setSpeakerVolume(1); conf.buzzer = true; saveConfigToEEPROM(); break;
+    case 302: setSpeakerVolume(2); conf.buzzer = true; saveConfigToEEPROM(); break;
+    case 303: setSpeakerVolume(3); conf.buzzer = true; saveConfigToEEPROM(); break;  
+     
     case 200: runloop = false; break; //stop
     case 201:
       runloop = true;
@@ -440,6 +442,8 @@ void getConfVal(char c) {
 
 
 }
+
+
 #else
 
 void getConfVal(char c) {
@@ -493,4 +497,20 @@ void getConfVal(char c) {
 
 }
 #endif
+
+
+void Volume_Button_Pressed(){
+  switch (conf.speakerVolume){
+  case 0:
+    setSpeakerVolume(1); conf.buzzer = true; saveConfigToEEPROM(); break;
+  case 1:
+    setSpeakerVolume(2); conf.buzzer = true; saveConfigToEEPROM(); break;
+  case 2:
+    setSpeakerVolume(3); conf.buzzer = true; saveConfigToEEPROM(); break;
+  case 3:
+    setSpeakerVolume(0); conf.buzzer = false; saveConfigToEEPROM(); break;
+  default:
+    setSpeakerVolume(2); conf.buzzer = true; saveConfigToEEPROM(); break;
+  }
+}
 

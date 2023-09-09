@@ -19,6 +19,7 @@ String getStringFromBool(bool bval);
 void getConfigVars() ;
 void getDefaultConfig();
 void getConfVal(char c);
+void Volume_Button_Pressed();
 
 const int C_SerialOut=1;
 const int C_SerialOutBT=2;

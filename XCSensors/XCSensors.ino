@@ -21,6 +21,7 @@
 #include <Average.h>
 #include "SendData.h"
 #include "Audio.h"
+#include <ezButton.h>
 
 /*
  * * IDE Notes
@@ -101,12 +102,13 @@ TimedAction readACCL = TimedAction(ACCLREADMS, readACCLSensor);  //processor to 
 MPU6050 accelgyro;
 #endif
 
-
-
-
-
 //VoltageReference vRef = VoltageReference();
 NMEA nmea;
+
+//-----------------------
+
+ezButton Volume_Button(PA6);
+
 
 //----------------------------------------------------------------------------//
 // Functions
@@ -390,6 +392,9 @@ void Send_GPS_Settings(const unsigned char *progmemBytes, size_t len) {
 
 void setup() {
 
+  Tone_Setup();
+  Volume_Button.setDebounceTime(75);
+
 #if defined(DEBUG)
   DEBUGSERIAL.println("Setup phase");
 #endif
@@ -471,8 +476,8 @@ void loop() {
   }
 
 
-  if (!startwait) {  //init the tables so it won't shock the system
-#if defined(VARIO)
+if (!startwait) {  //init the tables so it won't shock the system  
+#if defined(VARIO)    
     readVarioPressure();
     int32_t alt = baro.getAltitude(realPressureAv, conf.qnePressure);
     nmea_altitudeave.push(alt);
@@ -486,7 +491,7 @@ void loop() {
   if (SERIAL_CONFIG.available()) {
     char inChar = SERIAL_CONFIG.read();
     getConfVal(inChar);
-  }
+  }  
 #endif
 
   if (startwait && runloop) {  //Give the sensors time to warm up
@@ -530,4 +535,18 @@ Serial.println(micros() - loopstart);
 Serial.println();
 //On STM32C8 30us on idle, 740us on tx, and sometimes 6000us
 */
+
+
+    // Vario volume button config --------------------------------
+
+    Volume_Button.loop();
+    if(Volume_Button.isPressed()){
+      Volume_Button_Pressed();
+      if(conf.buzzer){
+        Tone_Play(1000, 300);
+      }else{
+        Tone_Play(500, 100);
+      }
+    }
+
 }

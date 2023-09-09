@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.inc": "cocos-effect",
+        "cstddef": "cpp"
+    }
+}

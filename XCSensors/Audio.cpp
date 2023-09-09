@@ -12,6 +12,7 @@
 //Audio related stuff
 
 #include <Arduino.h>
+#include <HardwareTimer.h>
 #include "Audio.h"
 #include "config.h"
 #include "Conf.h"
@@ -42,6 +43,90 @@ float testvario = -6;
 #define BASEPULSE 200
 #define TOPPULSE  1000
 
+// TONE VOLUME ----------------------------------------
+
+unsigned long tone_started;
+unsigned long tone_duration;
+bool is_playing;
+
+#define BUZZPIN PB0  //board pin
+
+#define PinTimer(pin) (PIN_MAP[pin].timer_device->clk_id - RCC_TIMER1 + 1)
+#define PinChannel(pin) (PIN_MAP[pin].timer_channel)
+
+uint8_t tone_channel = 3;            // timer channel used to generate frequency
+uint8_t tone_ntimer = 3;             // timer used to generate frequency
+
+HardwareTimer TTimer1(1), TTimer2(2), TTimer3(3), TTimer4(4);
+HardwareTimer *TTimer[4] =  { &TTimer1,&TTimer2,&TTimer3,&TTimer4 };
+HardwareTimer *tone_timer;
+
+void Tone_Loop();
+
+void Tone_Setup(){
+    tone_channel = PinChannel(BUZZPIN);
+    tone_ntimer = PinTimer(BUZZPIN);
+    tone_timer = TTimer[tone_ntimer-1];
+    tone_timer->attachCompare1Interrupt(Tone_Loop);
+    is_playing = false;
+}
+
+
+void Tone_Play(uint16_t frequency, uint32_t duration){
+
+  int volume_val;
+
+  switch (conf.speakerVolume){
+  case 0:
+    volume_val = 256;
+    break;
+  case 1:
+    volume_val = 256;
+    break;
+  case 2:
+    volume_val = 36;
+    break;
+  case 3:
+    volume_val = 2;
+    break;
+  default:
+    volume_val = 256;
+    break;
+  }
+    
+    pinMode(BUZZPIN, PWM);
+
+    int overflow = 256*1100/frequency;
+    int compare = overflow/volume_val;
+
+    tone_timer->pause();
+    tone_timer->setPrescaleFactor(256);              // 256
+    tone_timer->setOverflow(overflow);               // 256*1100/frequency
+    tone_timer->setCompare(tone_channel, compare);   // duty cycle
+    tone_timer->refresh();
+    tone_timer->resume();
+    
+    tone_started = millis();
+    tone_duration = duration;
+    is_playing = true;
+}
+
+void Tone_Stop(){
+    tone_timer->pause();
+    pinMode(BUZZPIN, INPUT);
+    is_playing = false;
+}
+
+
+void Tone_Loop(){
+    if( is_playing && millis() > tone_started + tone_duration){
+      Tone_Stop();
+    }
+}
+
+
+// --------------------------------------------------------
+
 
 
 // Non-Blocking beep blob beep
@@ -55,7 +140,7 @@ float testvario = -6;
 //     if ( wait < millis()) {
 //       toneOn = false;
 //       noTone(BUZZPIN);
-//       tone(BUZZPIN, freq2, intervald, conf.speakerVolume);
+//       tone(BUZZPIN, freq2, intervald);
 //       rm = millis();
 //     }
 
@@ -64,15 +149,13 @@ float testvario = -6;
      
 //     if(ndwait < millis()) {
     
-//     tone(BUZZPIN, freq, period, conf.speakerVolume);
+//     tone(BUZZPIN, freq, period);
 //     toneOn = true;
 //     tm = millis();
 //     }
 //   }
 
 // }
-
-
 
 
 // Non-Blocking beep beep beep
@@ -83,15 +166,17 @@ void playToneInterval(int freq, int period, int tinterval) {
 
     if ( wait < millis()) {
       toneOn = false;
-      noTone(BUZZPIN);
-      tcount++; // count the amount of beeps for playTonePause
+      // noTone(BUZZPIN);
+      Tone_Stop();
+      tcount++;            // count the amount of beeps for playTonePause
       if (tcount > 1000) { // prevent overflow
         tcount = 0;
       }
     }
 
   } else {
-    tone(BUZZPIN, freq, period/* , conf.speakerVolume */);
+    // tone(BUZZPIN, freq, period);
+    Tone_Play(freq, period);
     toneOn = true;
     tm = millis();
   }
@@ -106,11 +191,13 @@ void playToneContinuous(int freq) {
     int wait = period + tm;
     if ( wait <= millis()) {
       toneOn = false;
-      tone(BUZZPIN, freq, 300/* , conf.speakerVolume */);
+      // tone(BUZZPIN, freq, 300);
+      Tone_Play(freq, 300);
     }
 
   } else {
-    tone(BUZZPIN, freq, 300/*             */);
+    // tone(BUZZPIN, freq, 300);
+    Tone_Play(freq, 300);
     toneOn = true;
     tm = millis();
   }

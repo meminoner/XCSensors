@@ -25,4 +25,3 @@ extern bool takeoff;
 extern byte dhttemperature;
 extern byte dhthumidity;
 
-
