@@ -117,7 +117,7 @@ void getDefaultConfig() {
   conf.gliderSinkRate = -800;
 
   // Volume 0-1023
-  conf.speakerVolume = 128;
+  conf.speakerVolume = 2;
 }
 
 #if defined (SERIAL_CONFIG)
@@ -370,6 +370,7 @@ void setConf(int varname, char *value) {
     case 301: setSpeakerVolume(1); conf.buzzer = true; saveConfigToEEPROM(); break;
     case 302: setSpeakerVolume(2); conf.buzzer = true; saveConfigToEEPROM(); break;
     case 303: setSpeakerVolume(3); conf.buzzer = true; saveConfigToEEPROM(); break;  
+    case 304: setSpeakerVolume(4); conf.buzzer = true; saveConfigToEEPROM(); break;  
      
     case 200: runloop = false; break; //stop
     case 201:
@@ -500,17 +501,18 @@ void getConfVal(char c) {
 
 
 void Volume_Button_Pressed(){
-  switch (conf.speakerVolume){
-  case 0:
-    setSpeakerVolume(1); conf.buzzer = true; saveConfigToEEPROM(); break;
-  case 1:
-    setSpeakerVolume(2); conf.buzzer = true; saveConfigToEEPROM(); break;
-  case 2:
-    setSpeakerVolume(3); conf.buzzer = true; saveConfigToEEPROM(); break;
-  case 3:
-    setSpeakerVolume(0); conf.buzzer = false; saveConfigToEEPROM(); break;
-  default:
-    setSpeakerVolume(2); conf.buzzer = true; saveConfigToEEPROM(); break;
+  conf.speakerVolume++;
+  if(conf.speakerVolume > 4){
+    conf.speakerVolume = 0;
   }
+  
+  setSpeakerVolume(conf.speakerVolume); 
+  if(conf.speakerVolume == 0){
+    conf.buzzer = false; 
+  }else{
+    conf.buzzer = true; 
+  }
+  saveConfigToEEPROM();
+  
 }
 

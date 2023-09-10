@@ -87,6 +87,9 @@ void Tone_Play(uint16_t frequency, uint32_t duration){
     volume_val = 36;
     break;
   case 3:
+    volume_val = 16;
+    break;
+  case 4:
     volume_val = 2;
     break;
   default:
