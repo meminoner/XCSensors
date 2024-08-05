@@ -199,7 +199,7 @@ void readACCLSensor() {
   airspeed_status = fetch_airspeed_pressure(P_dat, T_dat);
   airspeed_psi = (((double)P_dat + 102.0 - (double)MS4525ZeroCounts) / ((double)MS4525Span)) * ((double)MS4525FullScaleRange);
   airspeed_psi = abs(airspeed_psi);
-  airspeed = sqrt((airspeed_psi * 13789.5144) / 1.225) * 3.6 * 1.33; // 1.33 fix from "XFlight Pitot Test 01" https://docs.google.com/spreadsheets/d/1ojkgztMuq16dv106xkR8URYw6ougcalto2iCSpBHG_Y/edit
+  airspeed = sqrt((airspeed_psi * 13789.5144) / 1.225) * 3.6 * conf.airspeed_calib; // 1.33 fix from "XFlight Pitot Test 01" https://docs.google.com/spreadsheets/d/1ojkgztMuq16dv106xkR8URYw6ougcalto2iCSpBHG_Y/edit
 }
 
 void resetACCLcompVal() {

@@ -20,6 +20,7 @@ void getConfigVars() ;
 void getDefaultConfig();
 void getConfVal(char c);
 void Volume_Button_Pressed();
+void setAirspeedCalib(double calib);
 
 const int C_SerialOut=1;
 const int C_SerialOutBT=2;
@@ -63,7 +64,8 @@ typedef struct {
   byte advMaxSmooth;
   int gliderSinkRate;
   int speakerVolume;
- 
+  double airspeed_calib;
+  
 } conf_t;
 
 

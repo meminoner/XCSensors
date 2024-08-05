@@ -118,6 +118,9 @@ void getDefaultConfig() {
 
   // Volume 0-1023
   conf.speakerVolume = 2;
+
+  // Airspeed calibration
+  conf.airspeed_calib = 1.33;
 }
 
 #if defined (SERIAL_CONFIG)
@@ -273,6 +276,10 @@ void setSpeakerVolume(int vol){
   conf.speakerVolume = vol;
 }
 
+void setAirspeedCalib(double calib){
+  conf.airspeed_calib = calib;
+}
+
 
 String getStringFromBool(bool bval) { //TODO: process Boolean values
   if (bval) {
@@ -339,6 +346,7 @@ bool getBoolFromVal(char *sval) { //TODO: process Boolean values
   }
 }
 
+
 void setConf(int varname, char *value) {
 
   switch (varname) {
@@ -371,7 +379,15 @@ void setConf(int varname, char *value) {
     case 302: setSpeakerVolume(2); conf.buzzer = true; saveConfigToEEPROM(); break;
     case 303: setSpeakerVolume(3); conf.buzzer = true; saveConfigToEEPROM(); break;  
     case 304: setSpeakerVolume(4); conf.buzzer = true; saveConfigToEEPROM(); break;  
-     
+    case 433: setAirspeedCalib(1.33); saveConfigToEEPROM(); break;
+    case 440: setAirspeedCalib(1.40); saveConfigToEEPROM(); break;
+    case 445: setAirspeedCalib(1.45); saveConfigToEEPROM(); break;
+    case 450: setAirspeedCalib(1.50); saveConfigToEEPROM(); break;
+    case 455: setAirspeedCalib(1.55); saveConfigToEEPROM(); break;
+    case 460: setAirspeedCalib(1.60); saveConfigToEEPROM(); break;
+    case 465: setAirspeedCalib(1.65); saveConfigToEEPROM(); break;
+    case 470: setAirspeedCalib(1.70); saveConfigToEEPROM(); break;
+    case 475: setAirspeedCalib(1.75); saveConfigToEEPROM(); break;
     case 200: runloop = false; break; //stop
     case 201:
       runloop = true;
