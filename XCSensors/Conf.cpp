@@ -120,7 +120,7 @@ void getDefaultConfig() {
   conf.speakerVolume = 2;
 
   // Airspeed calibration
-  conf.airspeed_calib = 1.33;
+  conf.airspeed_calib = 1.65;
 }
 
 #if defined (SERIAL_CONFIG)
@@ -149,7 +149,8 @@ void printaf(int n) {
     case C_advMinSmooth: SERIAL_CONFIG.print(C_advMinSmooth); SERIAL_CONFIG.print(F(") Adaptive vario minimum smooth level (ms): ")); break;
     case C_advMaxSmooth: SERIAL_CONFIG.print(C_advMaxSmooth); SERIAL_CONFIG.print(F(") Adaptive vario maximum smooth level (ms): ")); break;
     case C_gliderSinkRate: SERIAL_CONFIG.print(C_gliderSinkRate); SERIAL_CONFIG.print(F(") Glider sink rate (x1000): ")); break;
-
+    case C_speakerVolume: SERIAL_CONFIG.print(C_speakerVolume); SERIAL_CONFIG.print(F(") Speaker Volume: ")); break;
+    case C_airspeedCalib: SERIAL_CONFIG.print(C_airspeedCalib); SERIAL_CONFIG.print(F(") Airspeed Calibration: ")); break;
   }
 
 }
@@ -261,6 +262,12 @@ void getConfigVars() { // order is not that important
   printtf();
   printaf(C_gliderSinkRate);
   SERIAL_CONFIG.print(conf.gliderSinkRate);
+  printtf();
+  printaf(C_speakerVolume);
+  SERIAL_CONFIG.print(conf.speakerVolume);
+  printtf();
+  printaf(C_airspeedCalib);
+  SERIAL_CONFIG.print(conf.airspeed_calib);
   printtf();
 
 #if defined(EEPROMDEVMODE)

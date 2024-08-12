@@ -41,6 +41,8 @@ const int C_advRelaxTime=16;
 const int C_advMinSmooth=17;
 const int C_advMaxSmooth=18;
 const int C_gliderSinkRate=19;
+const int C_speakerVolume=20;
+const int C_airspeedCalib=21;
 
 typedef struct {
   int eepromSaveVersion;

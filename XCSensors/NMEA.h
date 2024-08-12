@@ -12,7 +12,7 @@ class NMEA {
   public:
     NMEA();
 
-    void setnmeaVarioLXWP0(double varioAlt, float a, float b, float c, float d, float e, float f);
+    void setnmeaVarioLXWP0(double varioAlt, float a, float b, float c, float d, float e, float f, float airspeed);
     void setVarioAlt(float tvarioAlt);
     void setGforce(float gforce, float airspeed);
     void setNmeaVarioSentence(long rawPressure, double varioAlt, float climbRate, float temperature, float voltage);

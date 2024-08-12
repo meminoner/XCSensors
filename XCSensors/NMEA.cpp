@@ -44,7 +44,6 @@ void NMEA::setGforce(float gforce, float airspeed) { //$FBG does not exist, unab
   strcat(t_NmeaAgforce, t_tail);
 
   sprintf(t_airspeed,"%d",(int)airspeed);
-  // dtostrf(airspeed, 2, 1, t_airspeed);
   strcat(t_NmeaAgforce, t_airspeed);
 
   strcat(t_NmeaAgforce, t_tail);
@@ -99,7 +98,7 @@ void NMEA::setPTAS1(double vario, double varioAv, double realAltitude) {
 
 }
 
-void NMEA::setnmeaVarioLXWP0(double varioAlt, float a, float b, float c, float d, float e, float f) { //in m/s
+void NMEA::setnmeaVarioLXWP0(double varioAlt, float a, float b, float c, float d, float e, float f, float airspeed) {
   // $LXWP0,logger_stored, airspeed, airaltitude,
   //   v1[0],v1[1],v1[2],v1[3],v1[4],v1[5], hdg, windspeed*CS<CR><LF>
   //
@@ -118,16 +117,29 @@ void NMEA::setnmeaVarioLXWP0(double varioAlt, float a, float b, float c, float d
   // $PDGFTL1, QNE m, QNH m, vario cm/s, netto vario , IAS km/h, L/D ground tens, wind speed km/h , wind dir, volt battery hundreds, *chksum
   // $PDGFTL1, 150.15,150.12,0.0,0.0,45.1,10,0.0,0.0,720,
 
-  char t_nmeaVarioLXWP0[60] = "$LXWP0,N,,";
-  // char t_nmeaVarioLXWP0[60] = "$PDGFTL1,150.15,150.12,0.0,0.0,45.1,10,0.0,0.0,720,";
+  //char t_nmeaVarioLXWP0[60] = "$LXWP0,N,";
+  //char t_nmeaVarioLXWP0[60] = "$PDGFTL1,150.15,150.12,0.0,0.0,45.1,10,0.0,0.0,720,";
+  //                             $PDGFTL1,,,,,45,,,,,
   char t_vario[5];
   char t_alt[9];
+
+  char t_spd[5];
 
   char t_tail[3] = ",,";
   char t_comma[2] = ",";
 
-  dtostrf(varioAlt, 5, 2, t_alt);
-  strcat(t_nmeaVarioLXWP0, t_alt);
+  char t_nmeaVarioLXWP0[60] = "";
+
+  sprintf(t_nmeaVarioLXWP0,"$PDGFTL1,,,,,%d,,,,,",(int)airspeed);
+  //strcat(t_nmeaVarioLXWP0, t_spd);
+
+  //strcat(t_nmeaVarioLXWP0, t_comma);
+  //dtostrf(varioAlt, 5, 2, t_alt);
+  //strcat(t_nmeaVarioLXWP0, t_alt);
+  //strcat(t_nmeaVarioLXWP0, ",,,,,,,,");
+
+
+  /*
   strcat(t_nmeaVarioLXWP0, t_comma);
   dtostrf(a, 2, 2, t_vario);
   strcat(t_nmeaVarioLXWP0, t_vario);
@@ -147,8 +159,9 @@ void NMEA::setnmeaVarioLXWP0(double varioAlt, float a, float b, float c, float d
   dtostrf(f, 2, 2, t_vario);
   strcat(t_nmeaVarioLXWP0, t_vario);
   strcat(t_nmeaVarioLXWP0, t_comma);
+  */
 
-  strcat(t_nmeaVarioLXWP0, t_tail);
+  //strcat(t_nmeaVarioLXWP0, t_tail);
   strcat(t_nmeaVarioLXWP0, "*");
 
   getCRC(t_nmeaVarioLXWP0);

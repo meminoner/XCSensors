@@ -264,9 +264,9 @@ void getSlowSensorData() {  //Sensor data not needed every 100ms
 #if defined(VARIO)
   varioAv = nmea_varioave.mean();
   if (conf.lxnav) {
-    nmea.setnmeaVarioLXWP0(previousAltitude, nmea_varioave.get(0), nmea_varioave.get(2), nmea_varioave.get(4), nmea_varioave.get(6), nmea_varioave.get(8), nmea_varioave.get(9));
+    nmea.setnmeaVarioLXWP0(previousAltitude, nmea_varioave.get(0), nmea_varioave.get(2), nmea_varioave.get(4), nmea_varioave.get(6), nmea_varioave.get(8), nmea_varioave.get(9),a_airspeed);
     //  float volt = vRef.readVcc();
-    nmea.setNmeaVarioSentence(realPressureAv, previousAltitude, varioAv, baro.getTemperature(), 0 / 1000);
+    //nmea.setNmeaVarioSentence(realPressureAv, previousAltitude, varioAv, baro.getTemperature(), 0 / 1000);
   }
 #endif
 #if defined(ACCL)
