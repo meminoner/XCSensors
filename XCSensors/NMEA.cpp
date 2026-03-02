@@ -111,35 +111,17 @@ void NMEA::setnmeaVarioLXWP0(double varioAlt, float a, float b, float c, float d
   // 11 windspeed [km/h] (not used in LX1600)
   //
   // e.g.:
-  // $LXWP0,Y,222.3    ,1665.5 ,1.71 ,,,,,,239,174,10.1
-  // $LXWP0, ,IAS(km/h),baroalt,vario,    ,    ,    ,    ,    ,,,
-  // $LXWP0, ,45.1     ,167.77 ,0.00 ,0.00,0.08,0.08,0.08,0.08,,,*23
-  // $PDGFTL1, QNE m, QNH m, vario cm/s, netto vario , IAS km/h, L/D ground tens, wind speed km/h , wind dir, volt battery hundreds, *chksum
-  // $PDGFTL1, 150.15,150.12,0.0,0.0,45.1,10,0.0,0.0,720,
+  // $LXWP0,Y,222.3,1665.5,1.71,,,,,,239,174,10.1
 
-  //char t_nmeaVarioLXWP0[60] = "$LXWP0,N,";
-  //char t_nmeaVarioLXWP0[60] = "$PDGFTL1,150.15,150.12,0.0,0.0,45.1,10,0.0,0.0,720,";
-  //                             $PDGFTL1,,,,,45,,,,,
+  char t_nmeaVarioLXWP0[60] = "$LXWP0,N,airspeed,";
   char t_vario[5];
   char t_alt[9];
-
-  char t_spd[5];
 
   char t_tail[3] = ",,";
   char t_comma[2] = ",";
 
-  char t_nmeaVarioLXWP0[60] = "";
-
-  sprintf(t_nmeaVarioLXWP0,"$PDGFTL1,,,,,%d,,,,,",(int)airspeed);
-  //strcat(t_nmeaVarioLXWP0, t_spd);
-
-  //strcat(t_nmeaVarioLXWP0, t_comma);
-  //dtostrf(varioAlt, 5, 2, t_alt);
-  //strcat(t_nmeaVarioLXWP0, t_alt);
-  //strcat(t_nmeaVarioLXWP0, ",,,,,,,,");
-
-
-  /*
+  dtostrf(varioAlt, 5, 2, t_alt);
+  strcat(t_nmeaVarioLXWP0, t_alt);
   strcat(t_nmeaVarioLXWP0, t_comma);
   dtostrf(a, 2, 2, t_vario);
   strcat(t_nmeaVarioLXWP0, t_vario);
@@ -159,9 +141,8 @@ void NMEA::setnmeaVarioLXWP0(double varioAlt, float a, float b, float c, float d
   dtostrf(f, 2, 2, t_vario);
   strcat(t_nmeaVarioLXWP0, t_vario);
   strcat(t_nmeaVarioLXWP0, t_comma);
-  */
 
-  //strcat(t_nmeaVarioLXWP0, t_tail);
+  strcat(t_nmeaVarioLXWP0, t_tail);
   strcat(t_nmeaVarioLXWP0, "*");
 
   getCRC(t_nmeaVarioLXWP0);
@@ -174,47 +155,42 @@ void NMEA::setnmeaVarioLXWP0(double varioAlt, float a, float b, float c, float d
 }
 
 
+
+
+
 void NMEA::setNmeaVarioSentence(long rawPressure, double varioAlt, float climbRate, float temperature, float voltage) {
-  //https://github.com/LK8000/LK8000/blob/master/Docs/LK8EX1.txt
-  //float t_temp = temperature/100;// not correct anymore
-  char t_nmeaVario[44] = "$LK8EX1,";
-  char t_climbRate[6];
-  char t_pressure[7];
-  char t_alt[6];
-  char t_temperature[6];
-  char t_voltage[4];
-  //char t_tail[2] = ",";
-  char t_comma[2] = ",";
+  
+  // Increased buffer size to 80 to guarantee no overflow panics
+  char t_nmeaVario[80]; 
+  
+  // 1. Convert to strict LK8EX1 integer types
+  // Note: Assuming climbRate is currently m/s, we multiply by 100 for cm/s
+  long alt_m = round(varioAlt);
+  long vario_cms = round(climbRate * 100.0f); 
+  long temp_c = round(temperature/100); 
 
-  dtostrf(rawPressure, 0, 0, t_pressure);
-  strcat(t_nmeaVario, t_pressure);
-  strcat(t_nmeaVario, t_comma);
-
-  dtostrf(varioAlt, 0, 0, t_alt);
-  strcat(t_nmeaVario, t_alt);
-  strcat(t_nmeaVario, t_comma);
-
-
-  dtostrf(climbRate, 0, 2, t_climbRate);
-  strcat(t_nmeaVario, t_climbRate);
-  strcat(t_nmeaVario, t_comma);
-
-  dtostrf(temperature, 0, 2, t_temperature);
-  strcat(t_nmeaVario, t_temperature);
-  strcat(t_nmeaVario, t_comma);
-
+  // 2. Format float for voltage (keeping dtostrf as some STM32 cores lack %f support in snprintf)
+  char t_voltage[8];
   dtostrf(voltage, 0, 1, t_voltage);
-  strcat(t_nmeaVario, t_voltage);
 
-  //strcat(t_nmeaVario, t_tail);
-  strcat(t_nmeaVario, "*");
+  // 3. Build the sentence payload cleanly in one go
+  // %ld stands for long decimal (integer), %s stands for string
+  snprintf(t_nmeaVario, sizeof(t_nmeaVario), "$LK8EX1,%ld,%ld,%ld,%ld,%s*", 
+           rawPressure, 
+           alt_m, 
+           vario_cms, 
+           temp_c, 
+           t_voltage);
 
-  getCRC(t_nmeaVario);
+  // 4. Calculate checksum (using your existing function)
+  getCRC(t_nmeaVario); 
 
+  // 5. Append checksum and the mandatory NMEA line endings
   strcat(t_nmeaVario, t_check);
 
+  // 6. Copy to the class variable
   strcpy(nmeaVario, t_nmeaVario);
-
+  
 }
 
 

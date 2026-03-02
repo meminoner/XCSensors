@@ -78,10 +78,10 @@ void getDefaultConfig() {
   conf.SerialOutUSB = true;
 
   // send ptas1 nmea, uses the gps channel (once every 100ms)
-  conf.ptas1 = true;
+  conf.ptas1 = true; // Disable for See You Navigator
 
   //send vario lxnav sentence
-  conf.lxnav = false;
+  conf.lxnav = false; // Enable for See You Navigator
 
   //use the c-probe nmea sentence
   conf.pcprobe = true;
